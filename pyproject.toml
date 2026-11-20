@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pokebox"
+version = "0.1.0"
+description = "A Pokemon team and PC storage manager"
+requires-python = ">=3.10"
+
+[project.scripts]
+pokebox = "pokebox.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
