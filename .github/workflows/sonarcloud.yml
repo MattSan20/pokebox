@@ -1,0 +1,42 @@
+name: SonarQube Cloud #name in Github Actions tab
+
+on: #trigger
+  push:
+    branches: [main] #every push to the main branch
+  workflow_dispatch: #lets you start manually with a button
+
+permissions:
+  contents: read #the workflow can only READ the repo
+
+jobs:
+  test-and-scan: #JOB: job int he workflow
+    runs-on: ubuntu-latest #runner; a linux machine from github
+
+    steps: #run in order, and stop at the first failure
+      - name: Check out repository
+        uses: actions/checkout@v6 #download repos code onto runner
+        with:
+          fetch-depth: 0 #get full git history so that Sonar is able to tell new from old code
+
+      - name: Setup Python
+        uses: actions/setup-python@v6 #install python on the runner
+        with:
+          python-version: '3.14' #same python version used in program and in development
+          cache: 'pip' #cache downlaoded packages so runs in the future run faster
+
+      - name: Install the dependencies and build packages
+        run: |
+          python -m pip install --upgrade pip #update pip, the package installer
+          pip install -r requirements.txt #install pytest and pytest-cov at the versions set in requirements
+          pip install -e  #build and install pokebox(Creates the command)
+
+      - name: Smoke test CLI
+        run: pokebox team #quick check that the installed actually runs | Should say that the team is empty
+
+      - name: Run test with coverage
+        run: pytest --cov=src --cov-report=xml:coverage.xml --cov-report=term #run tests, write coverage.xml for sonar, and print a summary in the log
+
+      - name: SonarQube Cloud scan
+        uses: SonarSource/sonarqube-scan-action@v6 #Scanner action ( reads sonar project properties)
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} #authenticate it by usnig the Github secret (value is enver shown)
