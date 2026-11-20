@@ -28,7 +28,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip #update pip, the package installer
           pip install -r requirements.txt #install pytest and pytest-cov at the versions set in requirements
-          pip install -e  #build and install pokebox(Creates the command)
+          pip install -e .  #build and install pokebox(Creates the command)
 
       - name: Smoke test CLI
         run: pokebox team #quick check that the installed actually runs | Should say that the team is empty
